@@ -1,0 +1,4 @@
+github.com/gordonklaus/portaudio v0.0.0-20260203164431-765aa7dfa631 h1:8TBHztmhDfAAg34yddptshinXBtDQwgKGlMfdtSFETw=
+github.com/gordonklaus/portaudio v0.0.0-20260203164431-765aa7dfa631/go.mod h1:esZFQEUwqC+l76f2R8bIWSwXMaPbp79PppwZ1eJhFco=
+github.com/madelynnblue/go-dsp v1.0.0 h1:ufzvSGl8IdjCA6BFVUx1cZW/aDiiXxDBWU1MpkrtAiM=
+github.com/madelynnblue/go-dsp v1.0.0/go.mod h1:dpf07Rj/u3te6cW3KwRBAqlyjP4InXHhNaYVuY73hHU=
