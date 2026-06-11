@@ -35,8 +35,8 @@ func NewDetector() *SirenDetector {
 
 func (d *SirenDetector) Detect(samples []float64) (bool, config.Direction) {
 	bins := fft.FFTReal(samples)
-	lowBin := binIndex(float64(config.SirenFreqLow), config.SampleRate, len(samples))
-	highBin := binIndex(float64(config.SirenFreqHigh), config.SampleRate, len(samples))
+	lowBin := binIndex(float64(config.SirenFreqLow), float64(config.SampleRate), len(samples))
+	highBin := binIndex(float64(config.SirenFreqHigh), float64(config.SampleRate), len(samples))
 	highBin = min(highBin, len(samples)/2-1)
 
 	energy := bandEnergy(bins, lowBin, highBin)
@@ -74,4 +74,28 @@ func bandEnergy(bins []complex128, lowBin int, highBin int) float64 {
 		energy += math.Sqrt(real*real + imag*imag)
 	}
 	return energy
+}
+
+func (d *SirenDetector) determineDirection() config.Direction {
+	n := len(d.energyEnvelope)
+	if n < 2 {
+		return config.DirectionUnknown
+	}
+	mid := n / 2
+	var firstHalfEnergy, secondHalfEnergy float64
+	for _, v := range d.energyEnvelope[:mid] {
+		firstHalfEnergy += v
+	}
+	for _, v := range d.energyEnvelope[mid:] {
+		secondHalfEnergy += v
+	}
+	diff := secondHalfEnergy - firstHalfEnergy
+	switch {
+	case diff > 0.5:
+		return config.DirectionApproaching
+	case diff < -0.5:
+		return config.DirectionReceding
+	default:
+		return config.DirectionStationary
+	}
 }
