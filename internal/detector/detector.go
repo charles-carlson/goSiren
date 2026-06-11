@@ -4,11 +4,11 @@ import (
 	"ambulance-tracker/config"
 	"math"
 
-	"github.com/madelynnblue/go-dsp/fft"
+	"github.com/mjibson/go-dsp/fft"
 )
 
 type Detector interface {
-	Detect(samples []float64) (bool, config.Direction)
+	Detect(samples []float32) (bool, config.Direction)
 }
 
 type SirenDetector struct {
@@ -33,8 +33,12 @@ func NewDetector() *SirenDetector {
 	}
 }
 
-func (d *SirenDetector) Detect(samples []float64) (bool, config.Direction) {
-	bins := fft.FFTReal(samples)
+func (d *SirenDetector) Detect(samples []float32) (bool, config.Direction) {
+	f64 := make([]float64, len(samples))
+	for i, v := range samples {
+		f64[i] = float64(v)
+	}
+	bins := fft.FFTReal(f64)
 	lowBin := binIndex(float64(config.SirenFreqLow), float64(config.SampleRate), len(samples))
 	highBin := binIndex(float64(config.SirenFreqHigh), float64(config.SampleRate), len(samples))
 	highBin = min(highBin, len(samples)/2-1)
@@ -58,7 +62,7 @@ func (d *SirenDetector) Detect(samples []float64) (bool, config.Direction) {
 		d.confirmationCounter = 0
 		return true, d.determineDirection()
 	}
-	return false, d.determineDirection()
+	return false, config.DirectionUnknown
 }
 
 // bin index = frequnecy * N / sample rate
